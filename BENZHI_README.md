@@ -1,0 +1,29 @@
+# Gg2995_2737
+
+Go project for module `lawdrive`.
+
+## Standard commands
+
+```bash
+go build ./...
+go test -count=1 ./...
+```
+
+## Run
+
+```bash
+go run ./cmd/caselawdrive
+```
+
+## Docker validation
+
+```bash
+chmod +x build_benzhi_docker.sh
+./build_benzhi_docker.sh my-go-task linux/arm64
+./build_benzhi_docker.sh my-go-task linux/amd64
+docker run -it my-go-task:latest
+```
+
+## Known initial failures
+
+Initial validation failures are retained in the package command output and run logs; they are not copied into the project repository.
