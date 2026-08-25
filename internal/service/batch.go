@@ -8,24 +8,21 @@ type ResourcePool interface {
 }
 
 func (s *Service) ExportBatch(documentIDs []string, pool ResourcePool) ([][]byte, error) {
-	resources := make([]Resource, 0, len(documentIDs))
-	defer func() {
-		for _, resource := range resources {
-			resource.Release()
-		}
-	}()
 	result := make([][]byte, 0, len(documentIDs))
 	for _, documentID := range documentIDs {
 		resource, err := pool.Acquire(documentID)
 		if err != nil {
 			return nil, fmt.Errorf("acquire export resource for %s: %w", documentID, err)
 		}
-		resources = append(resources, resource)
 		version, err := s.store.CurrentVersion(documentID)
 		if err != nil {
+			resource.Release()
 			return nil, err
 		}
 		result = append(result, append([]byte(nil), version.Content...))
+		// Each record's resource is released as soon as its work is done so
+		// the pool's quota is not held until the whole batch finishes.
+		resource.Release()
 	}
 	return result, nil
 }
